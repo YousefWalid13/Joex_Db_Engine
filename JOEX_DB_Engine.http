@@ -1,0 +1,6 @@
+@JOEX_DB_Engine_HostAddress = http://localhost:5197
+
+GET {{JOEX_DB_Engine_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
