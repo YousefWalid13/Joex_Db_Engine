@@ -1,40 +1,51 @@
-using JOEX_DB_Engine.Engine;
-using JOEX_DB_Engine.Interfaces;
+    using JOEX_DB_Engine.Engine;
+    using JOEX_DB_Engine.Interfaces;
 
-namespace JOEX_DB_Engine
-{
-    public class Program
+    namespace JOEX_DB_Engine
     {
-        public static void Main(string[] args)
+        public class Program
         {
-            var builder = WebApplication.CreateBuilder(args);
+            public static void Main(string[] args)
+            {
+                var builder = WebApplication.CreateBuilder(args);
 
-            builder.Services.AddControllers();
+                builder.Services.AddControllers();
+                builder.Services.AddEndpointsApiExplorer();
+                builder.Services.AddSwaggerGen();
 
-            // Swagger
-            builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
+                // Path comes from config — set in appsettings.json, overridable per environment
+                var dbPath = builder.Configuration["Database:Path"]
+                    ?? throw new InvalidOperationException(
+                        "Database:Path is not configured. Add it to appsettings.json.");
 
-            // Database Engine
-            builder.Services.AddSingleton<IDatabase>(
-                new Database("database.db"));
+                builder.Services.AddSingleton<IDatabase>(_ => new Database(dbPath));
 
-            var app = builder.Build();
+                var app = builder.Build();
 
-            var db = app.Services.GetRequiredService<IDatabase>();
-            db.Load();
+                // Load existing data from disk before accepting requests
+                var db = app.Services.GetRequiredService<IDatabase>();
+                try
+                {
+                    db.Load();
+                    app.Logger.LogInformation("Database loaded successfully from {Path}", dbPath);
+                }
+                catch (Exception ex)
+                {
+                    app.Logger.LogCritical(ex, "Failed to load database from {Path}. Shutting down.", dbPath);
+                    return; // abort startup cleanly instead of crashing mid-pipeline
+                }
 
-            // Swagger UI
-            app.UseSwagger();
-            app.UseSwaggerUI();
+                // Swagger only in development
+                if (app.Environment.IsDevelopment())
+                {
+                    app.UseSwagger();
+                    app.UseSwaggerUI();
+                }
 
-            app.UseHttpsRedirection();
-
-            app.UseAuthorization();
-
-            app.MapControllers();
-
-            app.Run();
+                app.UseHttpsRedirection();
+                app.UseAuthorization();
+                app.MapControllers();
+                app.Run();
+            }
         }
     }
-}

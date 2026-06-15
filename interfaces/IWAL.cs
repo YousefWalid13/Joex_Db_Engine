@@ -1,6 +1,9 @@
-﻿namespace JOEX_DB_Engine.interfaces
+﻿namespace JOEX_DB_Engine.Interfaces
 {
-    public class IWAL
+    public interface IWAL
     {
+        void Append(string key, string value);
+        void Delete(string key);
+        void Recover();
     }
 }

@@ -8,6 +8,9 @@ D:\Repo\JOEX_DB_Engine\JOEX_DB_Engine\bin\Debug\net9.0\JOEX_DB_Engine.dll
 D:\Repo\JOEX_DB_Engine\JOEX_DB_Engine\bin\Debug\net9.0\JOEX_DB_Engine.pdb
 D:\Repo\JOEX_DB_Engine\JOEX_DB_Engine\bin\Debug\net9.0\Microsoft.AspNetCore.OpenApi.dll
 D:\Repo\JOEX_DB_Engine\JOEX_DB_Engine\bin\Debug\net9.0\Microsoft.OpenApi.dll
+D:\Repo\JOEX_DB_Engine\JOEX_DB_Engine\bin\Debug\net9.0\Swashbuckle.AspNetCore.Swagger.dll
+D:\Repo\JOEX_DB_Engine\JOEX_DB_Engine\bin\Debug\net9.0\Swashbuckle.AspNetCore.SwaggerGen.dll
+D:\Repo\JOEX_DB_Engine\JOEX_DB_Engine\bin\Debug\net9.0\Swashbuckle.AspNetCore.SwaggerUI.dll
 D:\Repo\JOEX_DB_Engine\JOEX_DB_Engine\obj\Debug\net9.0\JOEX_DB_Engine.csproj.AssemblyReference.cache
 D:\Repo\JOEX_DB_Engine\JOEX_DB_Engine\obj\Debug\net9.0\rpswa.dswa.cache.json
 D:\Repo\JOEX_DB_Engine\JOEX_DB_Engine\obj\Debug\net9.0\JOEX_DB_Engine.GeneratedMSBuildEditorConfig.editorconfig
@@ -16,6 +19,7 @@ D:\Repo\JOEX_DB_Engine\JOEX_DB_Engine\obj\Debug\net9.0\JOEX_DB_Engine.AssemblyIn
 D:\Repo\JOEX_DB_Engine\JOEX_DB_Engine\obj\Debug\net9.0\JOEX_DB_Engine.csproj.CoreCompileInputs.cache
 D:\Repo\JOEX_DB_Engine\JOEX_DB_Engine\obj\Debug\net9.0\JOEX_DB_Engine.MvcApplicationPartsAssemblyInfo.cs
 D:\Repo\JOEX_DB_Engine\JOEX_DB_Engine\obj\Debug\net9.0\JOEX_DB_Engine.MvcApplicationPartsAssemblyInfo.cache
+D:\Repo\JOEX_DB_Engine\JOEX_DB_Engine\obj\Debug\net9.0\JOEX_DB_Engine.sourcelink.json
 D:\Repo\JOEX_DB_Engine\JOEX_DB_Engine\obj\Debug\net9.0\rjimswa.dswa.cache.json
 D:\Repo\JOEX_DB_Engine\JOEX_DB_Engine\obj\Debug\net9.0\rjsmrazor.dswa.cache.json
 D:\Repo\JOEX_DB_Engine\JOEX_DB_Engine\obj\Debug\net9.0\rjsmcshtml.dswa.cache.json
@@ -32,6 +36,3 @@ D:\Repo\JOEX_DB_Engine\JOEX_DB_Engine\obj\Debug\net9.0\refint\JOEX_DB_Engine.dll
 D:\Repo\JOEX_DB_Engine\JOEX_DB_Engine\obj\Debug\net9.0\JOEX_DB_Engine.pdb
 D:\Repo\JOEX_DB_Engine\JOEX_DB_Engine\obj\Debug\net9.0\JOEX_DB_Engine.genruntimeconfig.cache
 D:\Repo\JOEX_DB_Engine\JOEX_DB_Engine\obj\Debug\net9.0\ref\JOEX_DB_Engine.dll
-D:\Repo\JOEX_DB_Engine\JOEX_DB_Engine\bin\Debug\net9.0\Swashbuckle.AspNetCore.Swagger.dll
-D:\Repo\JOEX_DB_Engine\JOEX_DB_Engine\bin\Debug\net9.0\Swashbuckle.AspNetCore.SwaggerGen.dll
-D:\Repo\JOEX_DB_Engine\JOEX_DB_Engine\bin\Debug\net9.0\Swashbuckle.AspNetCore.SwaggerUI.dll
