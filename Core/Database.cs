@@ -1,5 +1,6 @@
 ﻿using JOEX_DB_Engine.Interfaces;
 using JOEX_DB_Engine.Storage;
+using JOEX_DB_Engine.Storage.LsmData;
 
 namespace JOEX_DB_Engine.Engine
 {
@@ -7,11 +8,13 @@ namespace JOEX_DB_Engine.Engine
     {
         private Dictionary<string, object> _data;
         private readonly DataFile _dataFile;
+        private readonly LsmEngine _lsmEngine;
 
         public Database(string filePath)
         {
             _dataFile = new DataFile(filePath);
             _data = new Dictionary<string, object>();
+            _lsmEngine = new LsmEngine(); // Initialize LsmEngine
         }
 
         public void Set(string key, object value)
@@ -34,7 +37,7 @@ namespace JOEX_DB_Engine.Engine
         public void Save()
         {
             // write to disk
-            _dataFile.Save(_data);
+            _lsmEngine.Flush(); // Flush data to LSM engine
         }
 
         public void Load()

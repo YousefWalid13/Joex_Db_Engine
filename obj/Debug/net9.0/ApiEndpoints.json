@@ -1,9 +1,9 @@
 [
   {
-    "ContainingType": "DatabaseController",
-    "Method": "Delete",
-    "RelativePath": "api/db/{key}",
-    "HttpMethod": "DELETE",
+    "ContainingType": "JOEX_DB_Engine.Controllers.DataController",
+    "Method": "Put",
+    "RelativePath": "api/data/{key}",
+    "HttpMethod": "PUT",
     "IsController": true,
     "Order": 0,
     "Parameters": [
@@ -11,14 +11,19 @@
         "Name": "key",
         "Type": "System.String",
         "IsRequired": true
+      },
+      {
+        "Name": "request",
+        "Type": "JOEX_DB_Engine.Models.PutRequest",
+        "IsRequired": true
       }
     ],
     "ReturnTypes": []
   },
   {
-    "ContainingType": "DatabaseController",
+    "ContainingType": "JOEX_DB_Engine.Controllers.DataController",
     "Method": "Get",
-    "RelativePath": "api/db/get/{key}",
+    "RelativePath": "api/data/{key}",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -32,24 +37,79 @@
     "ReturnTypes": []
   },
   {
-    "ContainingType": "DatabaseController",
-    "Method": "Set",
-    "RelativePath": "api/db/set",
-    "HttpMethod": "POST",
+    "ContainingType": "JOEX_DB_Engine.Controllers.DataController",
+    "Method": "Delete",
+    "RelativePath": "api/data/{key}",
+    "HttpMethod": "DELETE",
     "IsController": true,
     "Order": 0,
     "Parameters": [
       {
         "Name": "key",
         "Type": "System.String",
-        "IsRequired": false
-      },
-      {
-        "Name": "value",
-        "Type": "System.String",
-        "IsRequired": false
+        "IsRequired": true
       }
     ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JOEX_DB_Engine.Controllers.EngineController",
+    "Method": "Compact",
+    "RelativePath": "api/engine/compact",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JOEX_DB_Engine.Controllers.EngineController",
+    "Method": "Flush",
+    "RelativePath": "api/engine/flush",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JOEX_DB_Engine.Controllers.EngineController",
+    "Method": "MemTable",
+    "RelativePath": "api/engine/memtable",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JOEX_DB_Engine.Controllers.EngineController",
+    "Method": "SSTables",
+    "RelativePath": "api/engine/sstables",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JOEX_DB_Engine.Controllers.EngineController",
+    "Method": "Status",
+    "RelativePath": "api/engine/status",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JOEX_DB_Engine.Controllers.EngineController",
+    "Method": "WAL",
+    "RelativePath": "api/engine/wal",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
     "ReturnTypes": []
   }
 ]

@@ -6,7 +6,6 @@ D:\Repo\JOEX_DB_Engine\JOEX_DB_Engine\bin\Debug\net9.0\JOEX_DB_Engine.deps.json
 D:\Repo\JOEX_DB_Engine\JOEX_DB_Engine\bin\Debug\net9.0\JOEX_DB_Engine.runtimeconfig.json
 D:\Repo\JOEX_DB_Engine\JOEX_DB_Engine\bin\Debug\net9.0\JOEX_DB_Engine.dll
 D:\Repo\JOEX_DB_Engine\JOEX_DB_Engine\bin\Debug\net9.0\JOEX_DB_Engine.pdb
-D:\Repo\JOEX_DB_Engine\JOEX_DB_Engine\bin\Debug\net9.0\Microsoft.AspNetCore.OpenApi.dll
 D:\Repo\JOEX_DB_Engine\JOEX_DB_Engine\bin\Debug\net9.0\Microsoft.OpenApi.dll
 D:\Repo\JOEX_DB_Engine\JOEX_DB_Engine\bin\Debug\net9.0\Swashbuckle.AspNetCore.Swagger.dll
 D:\Repo\JOEX_DB_Engine\JOEX_DB_Engine\bin\Debug\net9.0\Swashbuckle.AspNetCore.SwaggerGen.dll
@@ -29,10 +28,10 @@ D:\Repo\JOEX_DB_Engine\JOEX_DB_Engine\obj\Debug\net9.0\staticwebassets.build.jso
 D:\Repo\JOEX_DB_Engine\JOEX_DB_Engine\obj\Debug\net9.0\staticwebassets.development.json
 D:\Repo\JOEX_DB_Engine\JOEX_DB_Engine\obj\Debug\net9.0\staticwebassets.build.endpoints.json
 D:\Repo\JOEX_DB_Engine\JOEX_DB_Engine\obj\Debug\net9.0\swae.build.ex.cache
-D:\Repo\JOEX_DB_Engine\JOEX_DB_Engine\obj\Debug\net9.0\staticwebassets.upToDateCheck.txt
 D:\Repo\JOEX_DB_Engine\JOEX_DB_Engine\obj\Debug\net9.0\JOEX_DB_.702ED03B.Up2Date
 D:\Repo\JOEX_DB_Engine\JOEX_DB_Engine\obj\Debug\net9.0\JOEX_DB_Engine.dll
 D:\Repo\JOEX_DB_Engine\JOEX_DB_Engine\obj\Debug\net9.0\refint\JOEX_DB_Engine.dll
 D:\Repo\JOEX_DB_Engine\JOEX_DB_Engine\obj\Debug\net9.0\JOEX_DB_Engine.pdb
 D:\Repo\JOEX_DB_Engine\JOEX_DB_Engine\obj\Debug\net9.0\JOEX_DB_Engine.genruntimeconfig.cache
 D:\Repo\JOEX_DB_Engine\JOEX_DB_Engine\obj\Debug\net9.0\ref\JOEX_DB_Engine.dll
+D:\Repo\JOEX_DB_Engine\JOEX_DB_Engine\obj\Debug\net9.0\staticwebassets.upToDateCheck.txt

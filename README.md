@@ -27,3 +27,28 @@ Data Structures, Concurrency
     Flush
      ↓
     SSTable
+
+
+
+
+
+
+
+
+
+
+    Controller
+    ↓
+Database
+    ↓
+WAL
+    ↓
+MemTable
+    ↓
+Flush
+    ↓
+SSTable
+    ↓
+Sparse Index
+    ↓
+Compaction
