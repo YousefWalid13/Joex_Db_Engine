@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("JOEX_DB_Engine")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+48e10982f617f83b2fc3ea46ef17ed54d292bf96")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+d2057309b2a858fcbeacc6966d3ed4e44d0f1286")]
 [assembly: System.Reflection.AssemblyProductAttribute("JOEX_DB_Engine")]
 [assembly: System.Reflection.AssemblyTitleAttribute("JOEX_DB_Engine")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
