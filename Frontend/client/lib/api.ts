@@ -69,10 +69,11 @@ export async function getData(key: string) {
   return res.data;
 }
 
-export async function putData(key: string, value: string) {
+export async function putData(key: string, value: unknown) {
   if (!key?.trim()) {
     throw new Error("Key is required");
   }
+
   if (value === undefined || value === null) {
     throw new Error("Value is required for put");
   }
