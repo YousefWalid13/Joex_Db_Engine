@@ -86,6 +86,30 @@
         }
       }
     },
+    "/api/engine/start": {
+      "post": {
+        "tags": [
+          "Engine"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/engine/stop": {
+      "post": {
+        "tags": [
+          "Engine"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/engine/memtable": {
       "get": {
         "tags": [

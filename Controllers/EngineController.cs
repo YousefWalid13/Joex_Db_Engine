@@ -31,7 +31,31 @@ public class EngineController : ControllerBase
         _logger = logger;
         _lsmEngine = lsmEngine; // ADDED
     }
+    [HttpPost("start")]
+    public IActionResult Start()
+    {
+        _lsmEngine.Start();
 
+        _logger.Log("INFO", "Engine started.");
+
+        return Ok(new
+        {
+            Message = "Engine started successfully."
+        });
+    }
+
+    [HttpPost("stop")]
+    public IActionResult Stop()
+    {
+        _lsmEngine.Stop();
+
+        _logger.Log("INFO", "Engine stopped.");
+
+        return Ok(new
+        {
+            Message = "Engine stopped successfully."
+        });
+    }
     [HttpGet("memtable")]
     public IActionResult MemTable()
     {

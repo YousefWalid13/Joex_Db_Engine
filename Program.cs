@@ -29,9 +29,28 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
+        // Add services
         builder.Services.AddControllers();
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
+
+        // -------------------- CORS --------------------
+        builder.Services.AddCors(options =>
+        {
+            options.AddPolicy("AllowFrontend", policy =>
+            {
+                policy
+                    .WithOrigins(
+                        "http://localhost:3000",
+                        "http://127.0.0.1:3000"
+                    // Add your Vercel URL here after deployment:
+                    // "https://your-app.vercel.app"
+                    )
+                    .AllowAnyHeader()
+                    .AllowAnyMethod();
+            });
+        });
+        // ------------------------------------------------
 
         var dbPath = builder.Configuration["Database:Path"]
                      ?? throw new InvalidOperationException("Database:Path is missing.");
@@ -52,7 +71,7 @@ public class Program
         if (!string.IsNullOrWhiteSpace(walDir))
             Directory.CreateDirectory(walDir);
 
-        // Legacy services (if EngineController still uses them)
+        // Legacy services
         builder.Services.AddSingleton<IDatabase>(_ =>
             new Database(dbPath));
 
@@ -61,7 +80,6 @@ public class Program
         builder.Services.AddSingleton<EngineStatistics>();
 
         builder.Services.AddSingleton<FileLogger>();
-
 
         // Main storage engine
         builder.Services.AddSingleton<LsmEngine>(_ =>
@@ -96,7 +114,6 @@ public class Program
             return;
         }
 
-       
         if (app.Environment.IsDevelopment())
         {
             app.UseSwagger();
@@ -104,6 +121,10 @@ public class Program
         }
 
         app.UseHttpsRedirection();
+
+        // Enable CORS
+        app.UseCors("AllowFrontend");
+
         app.UseAuthorization();
 
         app.MapControllers();

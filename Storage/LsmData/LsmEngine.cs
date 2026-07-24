@@ -2,9 +2,7 @@
 
 namespace JOEX_DB_Engine.Storage.LsmData
 {
-    // Internal wrapper so the MemTable can represent "this key was deleted"
-    // distinctly from "this key was never here" — needed for correct
-    // shadowing once older values exist in an SSTable on disk.
+    
     internal class MemTableEntry
     {
         public string? Value { get; set; }
@@ -14,7 +12,7 @@ namespace JOEX_DB_Engine.Storage.LsmData
     public class LsmEngine
     {
         private readonly ConcurrentDictionary<string, MemTableEntry> _memTable;
-        private readonly List<string> _sstableFiles; // ordered oldest -> newest
+        private readonly List<string> _sstableFiles; 
         private readonly string _dataDirectory;
         private readonly object _sstableLock = new();
         private readonly string _walPath;
@@ -30,8 +28,7 @@ namespace JOEX_DB_Engine.Storage.LsmData
 
             _walPath = Path.Combine(_dataDirectory, "wal.log");
 
-            // Recover any SSTables left over from a previous run, oldest first,
-            // so file names (and therefore recency order) sort correctly.
+           
             foreach (var file in Directory.GetFiles(_dataDirectory, "sstable_*.sst")
                                            .OrderBy(f => f, StringComparer.Ordinal))
             {
@@ -39,8 +36,7 @@ namespace JOEX_DB_Engine.Storage.LsmData
             }
             _sstableCounter = _sstableFiles.Count;
 
-            // Replay any writes left in the WAL from a previous run that
-            // never made it into an SSTable (e.g. crash before a Flush).
+         
             if (File.Exists(_walPath))
             {
                 using var stream = new FileStream(_walPath, FileMode.Open, FileAccess.Read);
@@ -54,9 +50,26 @@ namespace JOEX_DB_Engine.Storage.LsmData
                 }
             }
         }
+        public bool IsRunning { get; private set; } = true;
 
+        public void Start()
+        {
+            IsRunning = true;
+        }
+
+        public void Stop()
+        {
+            IsRunning = false;
+        }
+
+        private void EnsureRunning()
+        {
+            if (!IsRunning)
+                throw new InvalidOperationException("Engine is stopped.");
+        }
         private void AppendToWal(string key, string? value, bool isDeleted)
         {
+            EnsureRunning();
             lock (_walLock)
             {
                 using var stream = new FileStream(_walPath, FileMode.Append, FileAccess.Write);
@@ -69,6 +82,7 @@ namespace JOEX_DB_Engine.Storage.LsmData
 
         public void Put(string key, string value)
         {
+            EnsureRunning();
             if (string.IsNullOrWhiteSpace(key))
                 throw new ArgumentException("Key cannot be empty.");
 
@@ -78,6 +92,7 @@ namespace JOEX_DB_Engine.Storage.LsmData
 
         public GetResult Get(string key)
         {
+            EnsureRunning();
             if (string.IsNullOrWhiteSpace(key))
                 return new GetResult { Found = false };
 
@@ -109,6 +124,7 @@ namespace JOEX_DB_Engine.Storage.LsmData
 
         public void Delete(string key)
         {
+            EnsureRunning();
             if (string.IsNullOrWhiteSpace(key))
                 return;
 
@@ -129,12 +145,11 @@ namespace JOEX_DB_Engine.Storage.LsmData
 
         public void Flush()
         {
+            EnsureRunning();
             if (_memTable.IsEmpty)
                 return;
 
-            // Snapshot then clear. Anything Put/Deleted after this point lands
-            // in the now-empty MemTable, so nothing written during the flush
-            // gets lost or silently overwritten.
+            
             var snapshot = new Dictionary<string, MemTableEntry>(_memTable);
             foreach (var key in snapshot.Keys)
             {
@@ -163,6 +178,7 @@ namespace JOEX_DB_Engine.Storage.LsmData
 
         public void Compact()
         {
+            EnsureRunning();
             lock (_sstableLock)
             {
                 if (_sstableFiles.Count <= 1)
@@ -202,6 +218,7 @@ namespace JOEX_DB_Engine.Storage.LsmData
 
         private static void WriteSSTable(string path, IEnumerable<KeyValuePair<string, MemTableEntry>> entries)
         {
+
             using var stream = new FileStream(path, FileMode.Create, FileAccess.Write);
             using var writer = new BinaryWriter(stream);
 

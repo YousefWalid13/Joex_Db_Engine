@@ -94,9 +94,29 @@
   },
   {
     "ContainingType": "JOEX_DB_Engine.Controllers.EngineController",
+    "Method": "Start",
+    "RelativePath": "api/engine/start",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JOEX_DB_Engine.Controllers.EngineController",
     "Method": "Status",
     "RelativePath": "api/engine/status",
     "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JOEX_DB_Engine.Controllers.EngineController",
+    "Method": "Stop",
+    "RelativePath": "api/engine/stop",
+    "HttpMethod": "POST",
     "IsController": true,
     "Order": 0,
     "Parameters": [],

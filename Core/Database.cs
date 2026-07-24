@@ -14,7 +14,7 @@ namespace JOEX_DB_Engine.Engine
         {
             _dataFile = new DataFile(filePath);
             _data = new Dictionary<string, object>();
-            _lsmEngine = new LsmEngine(); // Initialize LsmEngine
+            _lsmEngine = new LsmEngine(); 
         }
 
         public void Set(string key, object value)
