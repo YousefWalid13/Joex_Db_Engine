@@ -1,6 +1,7 @@
 ﻿using JOEX_DB_Engine.Models;
 using JOEX_DB_Engine.Storage.LsmData;
 using Microsoft.AspNetCore.Mvc;
+using System.Text.Json;
 
 namespace JOEX_DB_Engine.Controllers
 {
@@ -20,32 +21,43 @@ namespace JOEX_DB_Engine.Controllers
         {
             _engine = engine;
         }
-        [HttpPut("{key}")]
-        public IActionResult Put(string key, [FromBody] PutRequest request)
-        {
-            if (string.IsNullOrWhiteSpace(key))
-                return BadRequest("Key is required.");
 
-            if (request == null)
-                return BadRequest("Request body is required.");
-
-            var existing = _engine.Get(key);
-
-            if (existing.Found)
-                return Conflict(new
-                {
-                    Message = $"Key '{key}' already exists."
-                });
-
-            _engine.Put(key, request.Value ?? string.Empty);
-
-            return Ok(new
+[HttpPut("{key}")]
+    public IActionResult Put(string key, [FromBody] PutRequest request)
+    {
+        if (string.IsNullOrWhiteSpace(key))
+            return BadRequest(new
             {
-                key,
-                status = "written"
+                message = "Key is required."
             });
-        }
-        [HttpGet("{key}")]
+
+        if (request == null)
+            return BadRequest(new
+            {
+                message = "Request body is required."
+            });
+
+        var existing = _engine.Get(key);
+
+        if (existing.Found)
+            return Conflict(new
+            {
+                message = $"Key '{key}' already exists."
+            });
+
+        // Store the JSON as a string
+        var json = request.Value.GetRawText();
+
+        _engine.Put(key, json);
+
+        return Ok(new
+        {
+            key,
+            value = JsonDocument.Parse(json).RootElement,
+            status = "written"
+        });
+    }
+    [HttpGet("{key}")]
         public IActionResult Get(string key)
         {
             var result = _engine.Get(key);
