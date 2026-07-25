@@ -1,4 +1,4 @@
-﻿namespace JOEX_DB_Engine.Models
+namespace JOEX_DB_Engine.Models
 {
     public class PutRequest
     {

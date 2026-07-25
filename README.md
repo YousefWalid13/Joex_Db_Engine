@@ -1,20 +1,3 @@
-﻿MiniDB (Joex)- Custom Database Engine
-
-Features:
-- Persistent Storage
-- MemTable
-- SSTable
-- LSM Tree
-- WAL Recovery
-- Indexing
-- Compaction
-- TCP Server
-- Custom Query Language
-
-Tech:
-File Systems,
-Data Structures, Concurrency
-
 # 🚀 JOEX DB Engine
 
 [![.NET Version](https://img.shields.io/badge/.NET-9.0-blueviolet?style=for-the-badge&logo=dotnet)](https://dotnet.microsoft.com/)
