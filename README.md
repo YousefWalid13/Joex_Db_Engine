@@ -524,13 +524,17 @@ Ensure your code builds successfully with `dotnet build` and follows standard C#
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
 ---
 
-## 👥 Authors & Contact
+## 👨‍💻 Author
 
-- **JOEX Developer** - *Creator & Lead Architect* - [@GitHub_Placeholder](https://github.com/) | [LinkedIn Placeholder](https://www.linkedin.com/)
+**Yousef Walid (YW)**  
+Backend Software Engineer
+
+- GitHub: https://github.com/YousefWalid13
+- LinkedIn: https://www.linkedin.com/in/yousefwalidsoftware
 
 ---
 
