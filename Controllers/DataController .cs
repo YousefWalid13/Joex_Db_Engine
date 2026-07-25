@@ -46,16 +46,16 @@ namespace JOEX_DB_Engine.Controllers
             });
 
         // Store the JSON as a string
-        var json = request.Value.GetRawText();
+        var json = request.Value;
 
-        _engine.Put(key, json);
+_engine.Put(key, json);
 
-        return Ok(new
-        {
-            key,
-            value = JsonDocument.Parse(json).RootElement,
-            status = "written"
-        });
+return Ok(new
+{
+    key,
+    value = json,
+    status = "written"
+});
     }
     [HttpGet("{key}")]
         public IActionResult Get(string key)
