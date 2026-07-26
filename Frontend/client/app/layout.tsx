@@ -5,9 +5,9 @@ import Sidebar from "@/components/sidebar/Sidebar";
 import QueryProvider from "@/components/providers/QueryProvider";
 
 export const metadata: Metadata = {
-  title: "JOEX DB Engine",
+  title: "JOX DB Engine",
   description:
-    "A Next.js frontend scaffold for JOEX DB Engine using the hosted Fly backend.",
+    "A Next.js frontend scaffold for JOX DB Engine using the hosted Fly backend.",
 };
 
 export default function RootLayout({
