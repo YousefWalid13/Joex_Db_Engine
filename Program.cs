@@ -30,7 +30,13 @@ public class Program
         var builder = WebApplication.CreateBuilder(args);
 
         // Add services
-        builder.Services.AddControllers();
+        builder.Services.AddControllers()
+            .AddJsonOptions(opts =>
+            {
+                opts.JsonSerializerOptions.PropertyNamingPolicy =
+                    System.Text.Json.JsonNamingPolicy.CamelCase;
+                opts.JsonSerializerOptions.DictionaryKeyPolicy = null; // keep key names as-is
+            });
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
 

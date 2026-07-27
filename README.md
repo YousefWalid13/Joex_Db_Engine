@@ -1,4 +1,4 @@
-# 🚀 JOEX DB Engine
+# 🚀 JOX DB Engine
 
 [![.NET Version](https://img.shields.io/badge/.NET-9.0-blueviolet?style=for-the-badge&logo=dotnet)](https://dotnet.microsoft.com/)
 [![Next.js Version](https://img.shields.io/badge/Next.js-16.2-black?style=for-the-badge&logo=nextdotjs)](https://nextjs.org/)
@@ -6,7 +6,7 @@
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-v4.0-38bdf8?style=for-the-badge&logo=tailwindcss)](https://tailwindcss.com/)
 [![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
 
-An educational, high-performance, lightweight database engine built from scratch in **C#** utilizing **.NET 9.0**. Inspired by modern Log-Structured Merge-Tree (LSM-Tree) databases like RocksDB, LevelDB, and Cassandra, **JOEX DB Engine** models storage engine internals (MemTable, WAL, SSTables, and Compaction) alongside a modern, reactive Next.js admin dashboard to visualize the system components in real time.
+An educational, high-performance, lightweight database engine built from scratch in **C#** utilizing **.NET 9.0**. Inspired by modern Log-Structured Merge-Tree (LSM-Tree) databases like RocksDB, LevelDB, and Cassandra, **JOX DB Engine** models storage engine internals (MemTable, WAL, SSTables, and Compaction) alongside a modern, reactive Next.js admin dashboard to visualize the system components in real time.
 
 ---
 
@@ -58,7 +58,7 @@ The system divides responsibilities between the **ASP.NET Core REST API** layer,
 ```mermaid
 graph TD
     Client[Client / Next.js Dashboard] <-->|HTTP / REST API| API[API Layer: Controllers]
-    
+
     subgraph Engine [JOEX LSM Engine]
         API <-->|Write / Read| LSM[LSM Engine Coordinator]
         LSM -->|1. Sync Write| WAL[(Write-Ahead Log: wal.log)]
@@ -67,7 +67,7 @@ graph TD
         LSM -->|4. Trigger Compaction| Compactor[Compactor / Merger]
         Compactor -->|Merge, Sort & Deduplicate| SSTableDir
     end
-    
+
     subgraph Read Path
         API -->|Query Key| ReadPath[Read Coordinator]
         ReadPath -->|Step 1: Check RAM| MemTable
@@ -80,27 +80,36 @@ graph TD
 ## ⚙️ System Design & Core Components
 
 ### 1. Engine (`LsmEngine`)
+
 The main coordinator of the system. It handles incoming reads, writes, and deletes, orchestrates the lifecycle of the WAL and MemTable, and exposes controls to manually flush the MemTable to disk or execute compactions.
 
 ### 2. MemTable
+
 An active, in-memory write buffer. All data writes (`Put`) and deletions (`Delete`) are cached in a thread-safe `ConcurrentDictionary` map. The MemTable provides instantaneous $O(1)$ read and write performance.
 
 ### 3. Write-Ahead Log (WAL)
+
 An append-only log file (`wal.log`) written in a fast binary format. Before a write is committed to the MemTable, it is serialized directly to the WAL:
+
 - Structure per log record: `[Key (string)] + [IsDeleted (bool)] + [Value (string)]`.
 - On engine boot, if a `wal.log` is detected, the engine deserializes and replays the records into the MemTable, guaranteeing zero data loss on unexpected shutdowns.
 
 ### 4. SSTables (Sorted String Tables)
+
 When the MemTable is flushed, its entries are sorted lexicographically by key and serialized into a binary SSTable file (`sstable_XXXXXX.sst`). Because SSTables are sorted:
+
 - They allow fast binary search lookups (conceptually).
 - They can be merged efficiently via a simple merge-sort algorithm.
 - They are completely **immutable** to avoid lock contention on disk reads.
 
 ### 5. LSM Tree Lifecycle
+
 Writes accumulate in memory (MemTable) and write ahead to the WAL. Over time, the MemTable is frozen, flushed to SSTable files on disk (Layer 0), and the WAL is cleared. When files build up, a background or manually triggered compaction step merges files to optimize read queries.
 
 ### 6. Compaction
+
 As files accumulate, reads can become slow due to search amplification (scanning multiple SSTables). The compactor merges all active SSTables:
+
 1. Scans SSTables from oldest to newest.
 2. Performs a key-by-key merge-sort.
 3. Overwrites older values with newer updates.
@@ -108,12 +117,15 @@ As files accumulate, reads can become slow due to search amplification (scanning
 5. Deletes the old SSTable files and registers a single consolidated SSTable.
 
 ### 7. Indexing & Sparse Index
+
 A helper structure (`SparseIndex`) is included which records specific key offsets at regular intervals within the storage blocks. Rather than scanning files entirely, reads query the sparse index to locate the closest byte offset in the SSTable file, jumping directly to the data.
 
 ### 8. Storage Manager
+
 Determines file paths, verifies integrity of directories, manages active file lists (`_sstableFiles`), and handles cleanups of outdated logs or dead SSTables post-compaction.
 
 ### 9. API Layer
+
 Built on ASP.NET Core Controllers. It translates JSON requests to typed models and interacts with the singleton storage engine instance.
 
 ---
@@ -234,12 +246,14 @@ JOEX_DB_Engine/
 ## 🛠️ Technologies Used
 
 ### Backend (.NET Engine)
+
 - **Framework**: [.NET 9.0](https://dotnet.microsoft.com/download/dotnet/9.0) / ASP.NET Core Web API
 - **Concurrency**: Native thread-safe collections (`ConcurrentDictionary`, `lock` primitives)
 - **Serialization**: Native `System.Text.Json` & `BinaryReader` / `BinaryWriter`
 - **Documentation**: OpenAPI / Swagger (via Swashbuckle)
 
 ### Frontend (Dashboard Client)
+
 - **Framework**: Next.js 16 (App Router) & React 19
 - **Languages**: TypeScript & HTML5
 - **Styling**: Tailwind CSS v4 & custom animations
@@ -254,6 +268,7 @@ JOEX_DB_Engine/
 ## 🚀 Installation & Setup
 
 ### Prerequisites
+
 - [.NET 9.0 SDK](https://dotnet.microsoft.com/download/dotnet/9.0) (Ensure `dotnet` is in your environment PATH)
 - [Node.js](https://nodejs.org/) (v18.x or higher) & npm
 
@@ -262,16 +277,19 @@ JOEX_DB_Engine/
 ### Building and Running the Backend
 
 1. **Navigate to the API project folder**:
+
    ```bash
    cd JOEX_DB_Engine/JOEX_DB_Engine
    ```
 
 2. **Restore NuGet dependencies**:
+
    ```bash
    dotnet restore
    ```
 
 3. **Build the project**:
+
    ```bash
    dotnet build
    ```
@@ -280,18 +298,20 @@ JOEX_DB_Engine/
    ```bash
    dotnet run
    ```
-   *By default, the server launches with Swagger enabled. Look for the console logs indicating the local port, typically: [http://localhost:5242](http://localhost:5242) or similar. You can view the OpenAPI specification at `http://localhost:<PORT>/swagger/index.html`.*
+   _By default, the server launches with Swagger enabled. Look for the console logs indicating the local port, typically: [http://localhost:5242](http://localhost:5242) or similar. You can view the OpenAPI specification at `http://localhost:<PORT>/swagger/index.html`._
 
 ---
 
 ### Running the Frontend Dashboard
 
 1. **Navigate to the frontend client folder**:
+
    ```bash
    cd JOEX_DB_Engine/Frontend/client
    ```
 
 2. **Install Node dependencies**:
+
    ```bash
    npm install
    ```
@@ -300,7 +320,7 @@ JOEX_DB_Engine/
    ```bash
    npm run dev
    ```
-   *Open [http://localhost:3000](http://localhost:3000) in your web browser to interact with the visual dashboard.*
+   _Open [http://localhost:3000](http://localhost:3000) in your web browser to interact with the visual dashboard._
 
 ---
 
@@ -308,13 +328,14 @@ JOEX_DB_Engine/
 
 ### Data Endpoints
 
-| Endpoint | Method | Description | Request Body | Response Codes |
-|---|---|---|---|---|
-| `/api/data/{key}` | `GET` | Fetches a record by its unique key. Checks MemTable first, then searches SSTables. | None | `200 OK` (Found)<br>`404 Not Found` (Missing or Deleted) |
-| `/api/data/{key}` | `PUT` | Inserts a new record. Fails with conflict if key already exists. | `{ "value": <any JSON> }` | `200 OK` (Written)<br>`400 Bad Request`<br>`409 Conflict` (Exists) |
-| `/api/data/{key}` | `DELETE` | Deletes a record by writing a Tombstone record. | None | `200 OK` (Deleted) |
+| Endpoint          | Method   | Description                                                                        | Request Body              | Response Codes                                                     |
+| ----------------- | -------- | ---------------------------------------------------------------------------------- | ------------------------- | ------------------------------------------------------------------ |
+| `/api/data/{key}` | `GET`    | Fetches a record by its unique key. Checks MemTable first, then searches SSTables. | None                      | `200 OK` (Found)<br>`404 Not Found` (Missing or Deleted)           |
+| `/api/data/{key}` | `PUT`    | Inserts a new record. Fails with conflict if key already exists.                   | `{ "value": <any JSON> }` | `200 OK` (Written)<br>`400 Bad Request`<br>`409 Conflict` (Exists) |
+| `/api/data/{key}` | `DELETE` | Deletes a record by writing a Tombstone record.                                    | None                      | `200 OK` (Deleted)                                                 |
 
 #### PUT Request Example
+
 ```json
 {
   "value": {
@@ -326,6 +347,7 @@ JOEX_DB_Engine/
 ```
 
 #### GET Response Example (Found)
+
 ```json
 {
   "found": true,
@@ -338,18 +360,19 @@ JOEX_DB_Engine/
 
 ### Engine Administration Endpoints
 
-| Endpoint | Method | Description | Request Body | Response Codes |
-|---|---|---|---|---|
-| `/api/engine/start` | `POST` | Starts/resumes the LSM Engine database. | None | `200 OK` |
-| `/api/engine/stop` | `POST` | Pauses/stops the LSM Engine database. | None | `200 OK` |
-| `/api/engine/status` | `GET` | Returns real-time health statistics of the engine. | None | `200 OK` |
-| `/api/engine/memtable` | `GET` | Returns MemTable status, record count, and capacity. | None | `200 OK` |
-| `/api/engine/wal` | `GET` | Returns size and state information for the Write-Ahead Log. | None | `200 OK` |
-| `/api/engine/sstables` | `GET` | Returns a list of all SSTable files stored on disk. | None | `200 OK`<br>`404 Not Found`<br>`500 Server Error` |
-| `/api/engine/flush` | `POST` | Forces the in-memory MemTable to persist to a new SSTable. | None | `200 OK` |
-| `/api/engine/compact` | `POST` | Triggers a full merge-compaction on all SSTable files. | None | `200 OK`<br>`500 Server Error` |
+| Endpoint               | Method | Description                                                 | Request Body | Response Codes                                    |
+| ---------------------- | ------ | ----------------------------------------------------------- | ------------ | ------------------------------------------------- |
+| `/api/engine/start`    | `POST` | Starts/resumes the LSM Engine database.                     | None         | `200 OK`                                          |
+| `/api/engine/stop`     | `POST` | Pauses/stops the LSM Engine database.                       | None         | `200 OK`                                          |
+| `/api/engine/status`   | `GET`  | Returns real-time health statistics of the engine.          | None         | `200 OK`                                          |
+| `/api/engine/memtable` | `GET`  | Returns MemTable status, record count, and capacity.        | None         | `200 OK`                                          |
+| `/api/engine/wal`      | `GET`  | Returns size and state information for the Write-Ahead Log. | None         | `200 OK`                                          |
+| `/api/engine/sstables` | `GET`  | Returns a list of all SSTable files stored on disk.         | None         | `200 OK`<br>`404 Not Found`<br>`500 Server Error` |
+| `/api/engine/flush`    | `POST` | Forces the in-memory MemTable to persist to a new SSTable.  | None         | `200 OK`                                          |
+| `/api/engine/compact`  | `POST` | Triggers a full merge-compaction on all SSTable files.      | None         | `200 OK`<br>`500 Server Error`                    |
 
 #### Status Response Example
+
 ```json
 {
   "status": "Running",
@@ -371,6 +394,7 @@ JOEX_DB_Engine/
 Here is how you can interact with the engine directly using the command line:
 
 ### 1. Write a key-value pair (PUT)
+
 ```bash
 curl -X PUT "http://localhost:5242/api/data/user_101" \
      -H "Content-Type: application/json" \
@@ -378,31 +402,37 @@ curl -X PUT "http://localhost:5242/api/data/user_101" \
 ```
 
 ### 2. Read the written key (GET)
+
 ```bash
 curl -X GET "http://localhost:5242/api/data/user_101"
 ```
 
 ### 3. Check the Engine Status
+
 ```bash
 curl -X GET "http://localhost:5242/api/engine/status"
 ```
 
 ### 4. Force a MemTable Flush to Disk
+
 ```bash
 curl -X POST "http://localhost:5242/api/engine/flush"
 ```
 
 ### 5. Check List of Flushed SSTable Files
+
 ```bash
 curl -X GET "http://localhost:5242/api/engine/sstables"
 ```
 
 ### 6. Trigger SSTable Compaction
+
 ```bash
 curl -X POST "http://localhost:5242/api/engine/compact"
 ```
 
 ### 7. Delete a Key (DELETE)
+
 ```bash
 curl -X DELETE "http://localhost:5242/api/data/user_101"
 ```
@@ -431,6 +461,7 @@ The engine can be configured using `appsettings.json` located in the root of the
 ```
 
 ### Configuration Variables:
+
 - **`Database:Path`**: Path to the legacy flat-file backup database.
 - **`Database:SSTableDirectory`**: Directory where the LSM Engine stores flushed SSTable files (`sstable_*.sst`).
 - **`Database:WALPath`**: File path to the binary Write-Ahead Log where un-flushed writes are stored.
@@ -439,7 +470,8 @@ The engine can be configured using `appsettings.json` located in the root of the
 
 ## 📝 Logging System
 
-JOEX DB Engine comes with a custom lightweight filesystem logger (`FileLogger`) injected as a singleton service:
+JOX DB Engine comes with a custom lightweight filesystem logger (`FileLogger`) injected as a singleton service:
+
 - **Location**: Logs are saved directly under the `Logs/` directory.
 - **Log Format**: `[TIMESTAMP] [LOG_LEVEL] [MESSAGE]`
 - **Monitored events**: Engine boot, service start/stop, MemTable flushes, compaction executions, and system exceptions.
@@ -454,16 +486,19 @@ Below are concepts of the user interface provided by the Next.js React Dashboard
 <summary>💻 Click to expand user interface designs</summary>
 
 ### 1. Main Telemetry Dashboard
+
 > A premium dashboard display visualizing active RAM MemTable limits, total disk files count, database file size, and write operation graphs.
 >
 > ![Dashboard Overview](https://raw.githubusercontent.com/placeholder-images/joex-db-dashboard.png)
 
 ### 2. SSTable Explorer
+
 > Visual representation of files saved in `Storage/LsmData/`. Allows users to inspect creation timestamps, block size, and execute Compaction with a single click.
 >
 > ![SSTables Inspector](https://raw.githubusercontent.com/placeholder-images/joex-sstables-inspector.png)
 
 ### 3. Log Console
+
 > Real-time monitoring of WAL changes and active thread-safe requests handled by the LSM core engine.
 >
 > ![WAL Console](https://raw.githubusercontent.com/placeholder-images/joex-wal-console.png)

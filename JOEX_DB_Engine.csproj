@@ -8,9 +8,13 @@
 
   <ItemGroup>
     <Compile Remove="Tests\**" />
+    <Compile Remove="JOEX_DB_Engine.Tests\**" />
     <Content Remove="Tests\**" />
+    <Content Remove="JOEX_DB_Engine.Tests\**" />
     <EmbeddedResource Remove="Tests\**" />
+    <EmbeddedResource Remove="JOEX_DB_Engine.Tests\**" />
     <None Remove="Tests\**" />
+    <None Remove="JOEX_DB_Engine.Tests\**" />
   </ItemGroup>
 
   <ItemGroup>

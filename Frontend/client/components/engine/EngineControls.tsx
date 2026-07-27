@@ -74,77 +74,83 @@ export default function EngineControls({ running }: { running?: boolean }) {
   }
 
   const baseBtn =
-    "flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-50";
+    "flex items-center justify-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-semibold transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-50";
 
   return (
-    <div className="flex flex-wrap items-center gap-3 px-6 pt-5">
-      <button
-        type="button"
-        onClick={() => handleAction("start")}
-        disabled={pending !== null || serverRunning}
-        className={`${baseBtn} bg-primary text-primary-foreground hover:bg-primary/90`}
-      >
-        {pending === "start" ? (
-          <Loader2 className="size-4 animate-spin" />
-        ) : (
-          <Play className="size-4" />
-        )}
-        Start Server
-      </button>
-      <button
-        type="button"
-        onClick={() => handleAction("stop")}
-        disabled={pending !== null || !serverRunning}
-        className={`${baseBtn} border border-border bg-transparent text-foreground hover:bg-secondary`}
-      >
-        {pending === "stop" ? (
-          <Loader2 className="size-4 animate-spin" />
-        ) : (
-          <Square className="size-4" />
-        )}
-        Stop Server
-      </button>
-      <button
-        type="button"
-        onClick={handleFlush}
-        disabled={pending !== null}
-        className={`${baseBtn} border border-border bg-card text-foreground hover:bg-secondary`}
-      >
-        {pending === "flush" ? (
-          <Loader2 className="size-4 animate-spin" />
-        ) : (
-          <Save className="size-4" />
-        )}
-        Flush MemTable
-      </button>
-      <button
-        type="button"
-        onClick={handleCompact}
-        disabled={pending !== null}
-        className={`${baseBtn} border border-border bg-card text-foreground hover:bg-secondary`}
-      >
-        {pending === "compact" ? (
-          <Loader2 className="size-4 animate-spin" />
-        ) : (
-          <Zap className="size-4" />
-        )}
-        Force Compaction
-      </button>
+    <div className="rounded-2xl border border-border/70 bg-card/70 p-4 shadow-sm sm:p-5">
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+        <div className="flex flex-wrap items-center gap-2.5">
+          <button
+            type="button"
+            onClick={() => handleAction("start")}
+            disabled={pending !== null || serverRunning}
+            className={`${baseBtn} border-transparent bg-primary text-primary-foreground hover:bg-primary/90`}
+          >
+            {pending === "start" ? (
+              <Loader2 className="size-4 animate-spin" />
+            ) : (
+              <Play className="size-4" />
+            )}
+            Start Server
+          </button>
+          <button
+            type="button"
+            onClick={() => handleAction("stop")}
+            disabled={pending !== null || !serverRunning}
+            className={`${baseBtn} border-border/70 bg-transparent text-foreground hover:bg-secondary`}
+          >
+            {pending === "stop" ? (
+              <Loader2 className="size-4 animate-spin" />
+            ) : (
+              <Square className="size-4" />
+            )}
+            Stop Server
+          </button>
+          <button
+            type="button"
+            onClick={handleFlush}
+            disabled={pending !== null}
+            className={`${baseBtn} border-border/70 bg-background/60 text-foreground hover:bg-secondary`}
+          >
+            {pending === "flush" ? (
+              <Loader2 className="size-4 animate-spin" />
+            ) : (
+              <Save className="size-4" />
+            )}
+            Flush MemTable
+          </button>
+          <button
+            type="button"
+            onClick={handleCompact}
+            disabled={pending !== null}
+            className={`${baseBtn} border-border/70 bg-background/60 text-foreground hover:bg-secondary`}
+          >
+            {pending === "compact" ? (
+              <Loader2 className="size-4 animate-spin" />
+            ) : (
+              <Zap className="size-4" />
+            )}
+            Force Compaction
+          </button>
+        </div>
 
-      <div className="ml-auto flex flex-col items-end gap-2">
-        <span
-          className={`flex items-center gap-2 rounded-full border border-border px-3 py-1.5 text-xs font-medium ${
-            serverRunning ? "text-emerald-400" : "text-muted-foreground"
-          }`}
-        >
+        <div className="flex flex-col items-start gap-2 lg:items-end">
           <span
-            className={`size-2 rounded-full ${serverRunning ? "bg-emerald-500" : "bg-muted-foreground"}`}
-          />
-          {serverRunning ? "Server Running" : "Server Stopped"}
-        </span>
-        {statusMessage ? (
-          <span className="text-xs text-muted-foreground">{statusMessage}</span>
-        ) : null}
+            className={`flex items-center gap-2 rounded-full border border-border/70 px-3 py-1.5 text-xs font-medium ${
+              serverRunning ? "text-emerald-400" : "text-muted-foreground"
+            }`}
+          >
+            <span
+              className={`size-2 rounded-full ${serverRunning ? "bg-emerald-500" : "bg-muted-foreground"}`}
+            />
+            {serverRunning ? "Server Running" : "Server Stopped"}
+          </span>
+          {statusMessage ? (
+            <span className="text-xs text-muted-foreground">
+              {statusMessage}
+            </span>
+          ) : null}
+        </div>
       </div>
     </div>
   );

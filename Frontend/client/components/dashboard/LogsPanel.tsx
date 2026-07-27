@@ -17,13 +17,15 @@ export default function LogsPanel({
   const recent = entries.slice(-8).reverse();
 
   return (
-    <div className="flex flex-col rounded-2xl border border-border bg-card p-5">
-      <div className="flex items-center gap-2 text-sm font-semibold">
-        <ScrollText className="size-4 text-primary" />
+    <div className="flex h-full flex-col rounded-2xl border border-border/70 bg-card/80 p-5 shadow-sm">
+      <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
+        <span className="flex size-8 items-center justify-center rounded-xl bg-primary/10 text-primary">
+          <ScrollText className="size-4" />
+        </span>
         Logs
       </div>
 
-      <div className="mt-4 flex-1 space-y-1.5 font-mono text-[11px] leading-relaxed">
+      <div className="mt-5 flex-1 space-y-1.5 overflow-hidden rounded-xl border border-border/70 bg-background/40 p-3 font-mono text-[11px] leading-relaxed">
         {isLoading && recent.length === 0 && (
           <p className="text-muted-foreground">Loading…</p>
         )}
@@ -32,7 +34,9 @@ export default function LogsPanel({
         )}
         {recent.map((e, i) => (
           <p key={i} className="truncate">
-            <span className="text-muted-foreground">{formatTime(e.timestamp)}</span>{" "}
+            <span className="text-muted-foreground">
+              {formatTime(e.timestamp)}
+            </span>{" "}
             <span className="text-primary">[INFO]</span>{" "}
             {e.op ? `${e.op} request` : "Engine event"}
             {e.key ? ` | key=${e.key}` : ""}
@@ -42,7 +46,7 @@ export default function LogsPanel({
 
       <Link
         href="/logs"
-        className="mt-4 flex items-center justify-center gap-1.5 rounded-lg border border-border py-2 text-sm text-muted-foreground transition hover:text-foreground"
+        className="mt-4 flex items-center justify-center gap-1.5 rounded-xl border border-border/70 py-2 text-sm text-muted-foreground transition-all duration-200 hover:bg-secondary hover:text-foreground"
       >
         View All Logs
         <ArrowRight className="size-3.5" />

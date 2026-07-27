@@ -1,4 +1,4 @@
-﻿using System.Collections.Concurrent;
+using System.Collections.Concurrent;
 
 namespace JOEX_DB_Engine.Storage.LsmData
 {
@@ -67,6 +67,7 @@ namespace JOEX_DB_Engine.Storage.LsmData
             if (!IsRunning)
                 throw new InvalidOperationException("Engine is stopped.");
         }
+
         private void AppendToWal(string key, string? value, bool isDeleted)
         {
             EnsureRunning();
@@ -141,7 +142,23 @@ namespace JOEX_DB_Engine.Storage.LsmData
                 .Where(kvp => !kvp.Value.IsDeleted)
                 .ToDictionary(kvp => kvp.Key, kvp => kvp.Value.Value ?? string.Empty);
         }
- 
+
+        public long GetMemTableSizeBytes()
+        {
+            long size = 0;
+            foreach (var kvp in _memTable)
+            {
+                if (!kvp.Value.IsDeleted)
+                {
+                    size += System.Text.Encoding.UTF8.GetByteCount(kvp.Key);
+                    if (kvp.Value.Value != null)
+                    {
+                        size += System.Text.Encoding.UTF8.GetByteCount(kvp.Value.Value);
+                    }
+                }
+            }
+            return size;
+        }
 
         public void Flush()
         {
@@ -176,13 +193,44 @@ namespace JOEX_DB_Engine.Storage.LsmData
             }
         }
 
-        public void Compact()
+        public IReadOnlyList<WalEntry> ReadWal()
+        {
+            var entries = new List<WalEntry>();
+
+            if (!File.Exists(_walPath))
+                return entries;
+
+            lock (_walLock)
+            {
+                using var stream = new FileStream(_walPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                using var reader = new BinaryReader(stream);
+
+                while (stream.Position < stream.Length)
+                {
+                    var key = reader.ReadString();
+                    var isDeleted = reader.ReadBoolean();
+                    var value = reader.ReadString();
+
+                    entries.Add(new WalEntry
+                    {
+                        Timestamp = DateTime.UtcNow,
+                        Op = isDeleted ? "DELETE" : "PUT",
+                        Key = key,
+                        Value = isDeleted ? null : value
+                    });
+                }
+            }
+
+            return entries;
+        }
+
+        public bool Compact()
         {
             EnsureRunning();
             lock (_sstableLock)
             {
                 if (_sstableFiles.Count <= 1)
-                    return;
+                    return false;
 
                 // Walk oldest -> newest so later files overwrite earlier ones
                 // for any key that appears in more than one SSTable.
@@ -213,6 +261,7 @@ namespace JOEX_DB_Engine.Storage.LsmData
 
                 _sstableFiles.Clear();
                 _sstableFiles.Add(mergedPath);
+                return true;
             }
         }
 

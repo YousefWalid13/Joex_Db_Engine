@@ -1,4 +1,4 @@
-﻿namespace JOEX_DB_Engine.Controllers;
+namespace JOEX_DB_Engine.Controllers;
 
 using JOEX_DB_Engine.Engine;
 using JOEX_DB_Engine.Interfaces;
@@ -59,59 +59,73 @@ public class EngineController : ControllerBase
     [HttpGet("memtable")]
     public IActionResult MemTable()
     {
-        var count = _lsmEngine.GetMemTable().Count; // CHANGED from _memTable.Count
+        var memTableEntries = _lsmEngine.GetMemTable();
+        var sizeBytes = _lsmEngine.GetMemTableSizeBytes();
+        var maxBytes = 10 * 1024 * 1024; // 10 MB limit for demo/threshold
+        var count = memTableEntries.Count;
+        var entries = memTableEntries
+            .Select(kvp => new { key = kvp.Key, value = kvp.Value })
+            .ToList();
+
         return Ok(new
         {
+            SizeBytes = sizeBytes,
+            MaxBytes = maxBytes,
+            RecordCount = count,
             Count = count,
             Capacity = 1000,
-            Usage = (count / 1000.0) * 100
+            Usage = (count / 1000.0) * 100,
+            Entries = entries,
+            EntriesMap = memTableEntries
         });
     }
 
     [HttpGet("wal")]
     public IActionResult WAL()
     {
-        // CHANGED: read LsmEngine's own wal.log (under lsmDataDir), not
-        // Database:WALPath which belongs to the old engine.
-        var lsmDataDir = _configuration["Database:LsmDirectory"] ?? "Storage/LsmData";
-        var wal = Path.Combine(lsmDataDir, "wal.log");
-        if (!System.IO.File.Exists(wal))
-            return Ok(Array.Empty<string>());
-        return Ok(new FileInfo(wal).Length > 0
-            ? new[] { $"{new FileInfo(wal).Length} bytes (binary WAL, not line-based)" }
-            : Array.Empty<string>());
+        return Ok(_lsmEngine.ReadWal());
     }
+
     [HttpGet("status")]
     public IActionResult Status()
     {
-        var walPath = _configuration["Database:WALPath"]!;
-        var dbPath = _configuration["Database:Path"]!;
-        var sstableDir = _configuration["Database:SSTableDirectory"]!;
+        var lsmDataDir = _configuration["Database:LsmDirectory"] ?? "Storage/LsmData";
+        var walPath = Path.Combine(lsmDataDir, "wal.log");
+        var sstableDir = _configuration["Database:SSTableDirectory"] ?? lsmDataDir;
+
+        long sstableSize = 0;
+        int sstableCount = 0;
+        if (Directory.Exists(sstableDir))
+        {
+            var sstFiles = Directory.GetFiles(sstableDir, "*.sst");
+            sstableCount = sstFiles.Length;
+            foreach (var file in sstFiles)
+            {
+                sstableSize += new FileInfo(file).Length;
+            }
+        }
+
+        long walSize = System.IO.File.Exists(walPath) ? new FileInfo(walPath).Length : 0;
+        long totalDiskUsage = sstableSize + walSize;
+
+        var memtable = _lsmEngine.GetMemTable();
+        var memtableSize = _lsmEngine.GetMemTableSizeBytes();
+        var memtableMaxBytes = 10 * 1024 * 1024; // 10 MB
 
         var result = new
         {
             Status = "Running",
-
+            IsRunning = true,
             StartedAt = _stats.StartedAt,
-
             Uptime = (DateTime.UtcNow - _stats.StartedAt).ToString(),
-
-            MemTableRecords = _memTable.Count,
-
-            SSTableCount = Directory
-                .GetFiles(sstableDir, "*.sst")
-                .Length,
-
-            WalSize = System.IO.File.Exists(walPath)
-                ? new FileInfo(walPath).Length
-                : 0,
-
-            DatabaseSize = System.IO.File.Exists(dbPath)
-                ? new FileInfo(dbPath).Length
-                : 0,
-
+            MemTableRecords = memtable.Count,
+            MemtableSizeBytes = memtableSize,
+            MemtableMaxBytes = memtableMaxBytes,
+            SSTableCount = sstableCount,
+            WalSize = walSize,
+            DiskUsageBytes = totalDiskUsage,
+            DatabaseSize = totalDiskUsage,
             FlushCount = _stats.FlushCount,
-
             CompactionCount = _stats.CompactionCount
         };
 
@@ -171,15 +185,19 @@ public class EngineController : ControllerBase
     {
         try
         {
-            _lsmEngine.Compact();
+            var compacted = _lsmEngine.Compact();
 
             _stats.CompactionCount++;
 
-            _logger.Log("INFO", "Compaction completed successfully.");
+            _logger.Log("INFO", compacted
+                ? "Compaction completed successfully."
+                : "Compaction skipped because there was nothing to merge.");
 
             return Ok(new
             {
-                Message = "Compaction completed successfully."
+                Message = compacted
+                    ? "Compaction completed successfully."
+                    : "Compaction skipped because there was nothing to merge."
             });
         }
         catch (Exception ex)

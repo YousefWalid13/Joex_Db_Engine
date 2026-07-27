@@ -17,7 +17,9 @@ export default function MemTablePanel({
   const queryClient = useQueryClient();
   const [pending, setPending] = useState(false);
 
-  const max = memtable.maxBytes ?? (memtable.sizeBytes ? memtable.sizeBytes * 2 : undefined);
+  const max =
+    memtable.maxBytes ??
+    (memtable.sizeBytes ? memtable.sizeBytes * 2 : undefined);
   const percent =
     memtable.sizeBytes !== undefined && max
       ? Math.min(100, (memtable.sizeBytes / max) * 100)
@@ -38,42 +40,50 @@ export default function MemTablePanel({
   }
 
   return (
-    <div className="rounded-2xl border border-border bg-card p-5">
-      <div className="flex items-center gap-2 text-sm font-semibold">
-        <Database className="size-4 text-primary" />
+    <div className="flex h-full flex-col rounded-2xl border border-border/70 bg-card/80 p-5 shadow-sm transition-all duration-200">
+      <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
+        <span className="flex size-8 items-center justify-center rounded-xl bg-primary/10 text-primary">
+          <Database className="size-4" />
+        </span>
         MemTable
       </div>
 
-      <div className="mt-4 flex items-center gap-6">
-        <div className="space-y-3 text-sm">
-          <div>
-            <p className="text-xs text-muted-foreground">Current Size</p>
-            <p className="text-lg font-semibold">
+      <div className="mt-5 flex flex-col gap-5 sm:flex-row sm:items-center">
+        <div className="flex-1 space-y-3 text-sm">
+          <div className="rounded-xl border border-border/70 bg-background/40 p-3">
+            <p className="text-[11px] uppercase tracking-[0.24em] text-muted-foreground">
+              Current Size
+            </p>
+            <p className="mt-1 text-lg font-semibold text-foreground">
               {isLoading ? "…" : formatBytes(memtable.sizeBytes)}
             </p>
           </div>
-          <div>
-            <p className="text-xs text-muted-foreground">Records</p>
-            <p className="text-lg font-semibold">
+          <div className="rounded-xl border border-border/70 bg-background/40 p-3">
+            <p className="text-[11px] uppercase tracking-[0.24em] text-muted-foreground">
+              Records
+            </p>
+            <p className="mt-1 text-lg font-semibold text-foreground">
               {isLoading ? "…" : formatNumber(memtable.recordCount)}
             </p>
           </div>
-          <div>
-            <p className="text-xs text-muted-foreground">Flush Threshold</p>
-            <p className="text-lg font-semibold">
+          <div className="rounded-xl border border-border/70 bg-background/40 p-3">
+            <p className="text-[11px] uppercase tracking-[0.24em] text-muted-foreground">
+              Flush Threshold
+            </p>
+            <p className="mt-1 text-lg font-semibold text-foreground">
               {percent !== undefined ? `${percent.toFixed(0)}%` : "—"}
             </p>
           </div>
         </div>
 
-        <div className="relative flex size-28 shrink-0 items-center justify-center">
+        <div className="relative flex size-28 shrink-0 items-center justify-center self-center rounded-full bg-background/60">
           <svg width={112} height={112} className="-rotate-90">
             <circle
               cx={56}
               cy={56}
               r={radius}
               fill="none"
-              stroke="var(--secondary)"
+              stroke="rgba(255,255,255,0.08)"
               strokeWidth={10}
             />
             <circle
@@ -87,7 +97,7 @@ export default function MemTablePanel({
               strokeLinecap="round"
             />
           </svg>
-          <span className="absolute text-lg font-semibold">
+          <span className="absolute text-lg font-semibold text-foreground">
             {percent !== undefined ? `${percent.toFixed(0)}%` : "—"}
           </span>
         </div>
@@ -97,9 +107,13 @@ export default function MemTablePanel({
         type="button"
         onClick={handleFlush}
         disabled={pending}
-        className="mt-4 flex w-full items-center justify-center gap-2 rounded-lg bg-primary py-2 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90 disabled:opacity-50"
+        className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl bg-primary py-2.5 text-sm font-semibold text-primary-foreground transition-all duration-200 hover:bg-primary/90 disabled:opacity-50"
       >
-        {pending ? <Loader2 className="size-4 animate-spin" /> : <Save className="size-4" />}
+        {pending ? (
+          <Loader2 className="size-4 animate-spin" />
+        ) : (
+          <Save className="size-4" />
+        )}
         Flush Now
       </button>
     </div>

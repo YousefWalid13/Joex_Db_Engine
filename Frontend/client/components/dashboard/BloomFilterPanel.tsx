@@ -13,38 +13,49 @@ const SET_BITS = new Set([
 
 export default function BloomFilterPanel() {
   return (
-    <div className="rounded-2xl border border-border bg-card p-5">
+    <div className="flex h-full flex-col rounded-2xl border border-border/70 bg-card/80 p-5 shadow-sm">
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2 text-sm font-semibold">
-          <Filter className="size-4 text-primary" />
+        <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
+          <span className="flex size-8 items-center justify-center rounded-xl bg-primary/10 text-primary">
+            <Filter className="size-4" />
+          </span>
           Bloom Filter
         </div>
         <span className="text-[11px] text-muted-foreground">Illustrative</span>
       </div>
 
-      <div className="mt-4 grid grid-cols-16 gap-1.5" style={{ gridTemplateColumns: `repeat(${COLS}, minmax(0, 1fr))` }}>
+      <div
+        className="mt-5 grid gap-1.5"
+        style={{ gridTemplateColumns: `repeat(${COLS}, minmax(0, 1fr))` }}
+      >
         {Array.from({ length: ROWS * COLS }, (_, i) => (
           <span
             key={i}
-            className={`aspect-square rounded-sm ${
-              SET_BITS.has(i) ? "bg-primary" : "bg-secondary"
+            className={`aspect-square rounded-[4px] ${
+              SET_BITS.has(i) ? "bg-primary" : "bg-secondary/80"
             }`}
           />
         ))}
       </div>
 
-      <div className="mt-4 grid grid-cols-3 gap-3 text-center text-sm">
-        <div>
-          <p className="text-xs text-muted-foreground">Hit Rate</p>
-          <p className="font-semibold">98.3%</p>
+      <div className="mt-5 grid grid-cols-3 gap-3 text-center text-sm">
+        <div className="rounded-xl border border-border/70 bg-background/40 p-2">
+          <p className="text-[11px] uppercase tracking-[0.24em] text-muted-foreground">
+            Hit Rate
+          </p>
+          <p className="mt-1 font-semibold text-foreground">98.3%</p>
         </div>
-        <div>
-          <p className="text-xs text-muted-foreground">False Positive</p>
-          <p className="font-semibold">0.7%</p>
+        <div className="rounded-xl border border-border/70 bg-background/40 p-2">
+          <p className="text-[11px] uppercase tracking-[0.24em] text-muted-foreground">
+            False Positive
+          </p>
+          <p className="mt-1 font-semibold text-foreground">0.7%</p>
         </div>
-        <div>
-          <p className="text-xs text-muted-foreground">Memory Used</p>
-          <p className="font-semibold">12.4 MB</p>
+        <div className="rounded-xl border border-border/70 bg-background/40 p-2">
+          <p className="text-[11px] uppercase tracking-[0.24em] text-muted-foreground">
+            Memory Used
+          </p>
+          <p className="mt-1 font-semibold text-foreground">12.4 MB</p>
         </div>
       </div>
     </div>

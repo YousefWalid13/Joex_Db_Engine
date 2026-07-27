@@ -44,7 +44,8 @@ export default function SettingsPage() {
             </div>
           </dl>
           <p className="mt-4 text-xs text-muted-foreground">
-            Override with the <code className="font-mono">NEXT_PUBLIC_API_BASE_URL</code>{" "}
+            Override with the{" "}
+            <code className="font-mono">NEXT_PUBLIC_API_BASE_URL</code>{" "}
             environment variable at build time.
           </p>
         </div>
@@ -76,7 +77,7 @@ export default function SettingsPage() {
             About
           </div>
           <p className="mt-3 text-sm text-muted-foreground">
-            JOEX DB Engine is an LSM-tree based storage engine. This dashboard
+            JOX DB Engine is an LSM-tree based storage engine. This dashboard
             polls the hosted API for live status, MemTable, SSTable, and
             write-ahead log data, and can trigger a MemTable flush or forced
             compaction directly from the UI.

@@ -1,7 +1,18 @@
 "use client";
 
 import { useState } from "react";
-import { KeyRound, Search, Plus, Trash2, Loader2, Upload } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
+import {
+  KeyRound,
+  Search,
+  Plus,
+  Trash2,
+  Loader2,
+  Upload,
+  Database,
+  FileText,
+  Archive,
+} from "lucide-react";
 import TopBar from "@/components/topbar/TopBar";
 import { useStatus } from "@/hooks/useStatus";
 import { getData, putData, deleteData, uploadDataFile } from "@/lib/api";
@@ -22,6 +33,7 @@ function parseValue(raw: string): unknown {
 
 export default function DataPage() {
   const { isError: statusError } = useStatus();
+  const queryClient = useQueryClient();
   const [key, setKey] = useState("");
   const [value, setValue] = useState("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -55,6 +67,12 @@ export default function DataPage() {
     setPending("put");
     try {
       const data = await putData(key.trim(), parseValue(value));
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["engine-memtable"] }),
+        queryClient.invalidateQueries({ queryKey: ["engine-wal"] }),
+        queryClient.invalidateQueries({ queryKey: ["engine-sstables"] }),
+        queryClient.invalidateQueries({ queryKey: ["engine-status"] }),
+      ]);
       setResult({
         kind: "success",
         action: "PUT",
@@ -72,6 +90,12 @@ export default function DataPage() {
     setPending("delete");
     try {
       const data = await deleteData(key.trim());
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["engine-memtable"] }),
+        queryClient.invalidateQueries({ queryKey: ["engine-wal"] }),
+        queryClient.invalidateQueries({ queryKey: ["engine-sstables"] }),
+        queryClient.invalidateQueries({ queryKey: ["engine-status"] }),
+      ]);
       setResult({
         kind: "success",
         action: "DELETE",
@@ -94,6 +118,12 @@ export default function DataPage() {
     setPending("upload");
     try {
       const data = await uploadDataFile(selectedFile);
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["engine-memtable"] }),
+        queryClient.invalidateQueries({ queryKey: ["engine-wal"] }),
+        queryClient.invalidateQueries({ queryKey: ["engine-sstables"] }),
+        queryClient.invalidateQueries({ queryKey: ["engine-status"] }),
+      ]);
       setResult({
         kind: "success",
         action: "UPLOAD",
@@ -118,14 +148,28 @@ export default function DataPage() {
         online={!statusError}
       />
 
-      <section className="grid grid-cols-1 gap-4 px-6 py-5 lg:grid-cols-2">
-        <div className="rounded-2xl border border-border bg-card p-5">
+      <section className="grid grid-cols-1 gap-3 px-4 py-5 sm:px-6 xl:grid-cols-[1.15fr_0.85fr]">
+        <div className="rounded-2xl border border-border bg-card p-4 sm:p-5">
           <div className="flex items-center gap-2 text-sm font-semibold">
             <KeyRound className="size-4 text-primary" />
             Key / Value
           </div>
 
           <div className="mt-4 space-y-3">
+            <div className="grid grid-cols-1 gap-3 rounded-xl border border-border/70 bg-background/60 p-3 sm:grid-cols-3">
+              <div className="flex items-center gap-2 text-sm">
+                <Database className="size-4 text-primary" />
+                <span className="font-medium">MemTable</span>
+              </div>
+              <div className="flex items-center gap-2 text-sm">
+                <FileText className="size-4 text-primary" />
+                <span className="font-medium">WAL</span>
+              </div>
+              <div className="flex items-center gap-2 text-sm">
+                <Archive className="size-4 text-primary" />
+                <span className="font-medium">SSTables</span>
+              </div>
+            </div>
             <div>
               <label
                 className="text-xs text-muted-foreground"
@@ -270,7 +314,7 @@ export default function DataPage() {
               </p>
             )}
             {result.kind === "success" && (
-              <pre className="max-h-96 overflow-auto whitespace-pre-wrap break-words rounded-lg bg-secondary p-3 font-mono text-xs">
+              <pre className="max-h-96 overflow-auto whitespace-pre-wrap break-all rounded-lg bg-secondary p-3 font-mono text-xs">
                 {result.payload}
               </pre>
             )}

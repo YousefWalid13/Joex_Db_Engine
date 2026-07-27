@@ -10,9 +10,13 @@ interface DeleteNotFoundResponse {
   message: string;
 }
 
+const fallbackBaseUrl =
+  typeof window !== "undefined" && window.location.hostname === "localhost"
+    ? "http://localhost:5197"
+    : "https://joex-db-engine-wandering-grass-7853.fly.dev/";
+
 export const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL ||
-  "https://joex-db-engine-wandering-grass-7853.fly.dev/";
+  process.env.NEXT_PUBLIC_API_BASE_URL || fallbackBaseUrl;
 
 export const api = axios.create({
   baseURL: API_BASE_URL,

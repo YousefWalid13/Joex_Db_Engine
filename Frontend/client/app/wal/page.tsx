@@ -11,6 +11,8 @@ const opColor: Record<string, string> = {
   DELETE: "text-red-400",
   FLUSH: "text-primary",
   GET: "text-sky-400",
+  WRITE: "text-emerald-400",
+  BINARY: "text-yellow-400",
 };
 
 export default function WALPage() {
@@ -46,32 +48,43 @@ export default function WALPage() {
               <tbody className="font-mono text-xs">
                 {isError && (
                   <tr>
-                    <td colSpan={4} className="py-6 text-center text-muted-foreground">
+                    <td
+                      colSpan={4}
+                      className="py-6 text-center text-muted-foreground"
+                    >
                       Couldn&apos;t reach the engine API.
                     </td>
                   </tr>
                 )}
                 {!isError && !isLoading && ordered.length === 0 && (
                   <tr>
-                    <td colSpan={4} className="py-6 text-center text-muted-foreground">
+                    <td
+                      colSpan={4}
+                      className="py-6 text-center text-muted-foreground"
+                    >
                       No WAL entries yet.
                     </td>
                   </tr>
                 )}
-                {ordered.map((e, i) => (
-                  <tr key={i} className="border-b border-border/60">
-                    <td className="py-2 pr-4 text-muted-foreground">
-                      {formatTime(e.timestamp)}
-                    </td>
-                    <td className={`py-2 pr-4 font-semibold ${opColor[e.op ?? ""] ?? ""}`}>
-                      {e.op ?? "—"}
-                    </td>
-                    <td className="py-2 pr-4">{e.key ?? "—"}</td>
-                    <td className="py-2 text-muted-foreground">
-                      {e.value !== undefined ? JSON.stringify(e.value) : "-"}
-                    </td>
-                  </tr>
-                ))}
+                {ordered.map((e, i) => {
+                  const displayOp = e.op === "PUT" ? "WRITE" : e.op;
+                  return (
+                    <tr key={i} className="border-b border-border/60">
+                      <td className="py-2 pr-4 text-muted-foreground">
+                        {formatTime(e.timestamp)}
+                      </td>
+                      <td
+                        className={`py-2 pr-4 font-semibold ${opColor[displayOp ?? ""] ?? ""}`}
+                      >
+                        {displayOp ?? "—"}
+                      </td>
+                      <td className="py-2 pr-4">{e.key ?? "—"}</td>
+                      <td className="py-2 text-muted-foreground">
+                        {e.value !== undefined ? JSON.stringify(e.value) : "-"}
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>

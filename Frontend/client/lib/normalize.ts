@@ -1,5 +1,5 @@
 /**
- * The live JOEX DB Engine API's exact JSON field naming isn't fully known
+ * The live JOX DB Engine API's exact JSON field naming isn't fully known
  * ahead of time, so these helpers look up a value under several likely
  * key spellings (camelCase / snake_case / short aliases) and fall back to
  * `undefined` if nothing matches, rather than throwing.
@@ -179,34 +179,82 @@ export interface MemTableView {
   entries?: AnyObj[];
 }
 
+// Strip outer JSON quotes from raw-JSON strings stored in the LSM engine
+// e.g. '"Yousef"' -> 'Yousef', '21' stays '21'
+function unwrapRawJson(v: unknown): unknown {
+  if (typeof v !== "string") return v;
+  try {
+    const parsed = JSON.parse(v);
+    // Only unwrap if the parsed result is a primitive (not object/array)
+    if (typeof parsed !== "object" || parsed === null) return parsed;
+    return parsed;
+  } catch {
+    return v;
+  }
+}
+
 export function normalizeMemTable(
   raw: AnyObj | undefined | null,
 ): MemTableView {
   if (!raw) return {};
   const root: AnyObj = (raw.data as AnyObj) ?? raw;
-  const entries = pickArray(root, ["entries", "records", "items", "keys"]) as
-    | AnyObj[]
-    | undefined;
+  // The backend may return entries as an array OR as an object map { key: value }.
+  // Normalize both shapes to an array of { key, value } so the UI can render
+  // entries consistently and the record count is computed reliably.
+  // C# returns PascalCase "Entries"; also handle lowercase variants.
+  const rawEntries = pick(root, [
+    "Entries",
+    "entries",
+    "records",
+    "items",
+    "keys",
+  ]);
+  let entries: AnyObj[] | undefined;
+
+  if (Array.isArray(rawEntries)) {
+    entries = (rawEntries as AnyObj[]).map((e) => ({
+      key: pickString(e, ["key", "Key", "id", "Id", "name", "Name"]),
+      value: unwrapRawJson(e.value ?? e.Value ?? e),
+    }));
+  } else if (rawEntries && typeof rawEntries === "object") {
+    entries = Object.entries(rawEntries)
+      .map(([k, v]) => ({
+        key: k,
+        value: unwrapRawJson(v),
+      }))
+      .sort((a, b) =>
+        String(a.key ?? "").localeCompare(String(b.key ?? ""), undefined, {
+          numeric: true,
+          sensitivity: "base",
+        }),
+      );
+  }
+
+  const explicitCount = pickNumber(root, [
+    "RecordCount",
+    "recordCount",
+    "record_count",
+    "count",
+    "Count",
+    "numRecords",
+  ]);
+
   return {
     sizeBytes: pickNumber(root, [
+      "SizeBytes",
       "sizeBytes",
       "size_bytes",
       "size",
       "currentSize",
     ]),
     maxBytes: pickNumber(root, [
+      "MaxBytes",
       "maxBytes",
       "max_bytes",
       "capacity",
       "threshold",
     ]),
-    recordCount:
-      pickNumber(root, [
-        "recordCount",
-        "record_count",
-        "count",
-        "numRecords",
-      ]) ?? entries?.length,
+    recordCount: explicitCount ?? entries?.length,
     entries,
   };
 }
@@ -275,10 +323,56 @@ export function normalizeWAL(raw: AnyObj | undefined | null): WALEntry[] {
       | AnyObj[]
       | undefined) ?? (Array.isArray(raw) ? (raw as AnyObj[]) : undefined);
 
-  return (rawEntries ?? []).map((e) => ({
-    timestamp: pickString(e, ["timestamp", "time", "ts"]),
-    op: pickString(e, ["op", "operation", "type", "command"])?.toUpperCase(),
-    key: pickString(e, ["key"]),
-    value: pick(e, ["value", "val"]),
-  }));
+  function extractOp(obj: AnyObj | undefined | null): string | undefined {
+    if (!obj) return undefined;
+
+    // Try shallow fields first
+    const candidate = pick(obj, [
+      "op",
+      "operation",
+      "type",
+      "command",
+      "opType",
+      "operationType",
+      "opcode",
+      "action",
+    ]);
+
+    if (candidate === undefined || candidate === null) return undefined;
+
+    // If candidate is primitive, return its string form
+    if (typeof candidate === "string" || typeof candidate === "number") {
+      return String(candidate).toUpperCase();
+    }
+
+    // If candidate is an object, attempt to pull common nested fields
+    if (typeof candidate === "object") {
+      const nested = pick(candidate as AnyObj, [
+        "type",
+        "op",
+        "operation",
+        "command",
+        "action",
+      ]);
+      if (typeof nested === "string" || typeof nested === "number") {
+        return String(nested).toUpperCase();
+      }
+    }
+
+    return undefined;
+  }
+
+  return (rawEntries ?? []).map((e) => {
+    const rawOp = extractOp(e);
+    // Map common verbs to the UI-friendly labels
+    const op =
+      rawOp === "PUT" || rawOp === "SET" || rawOp === "WRITE" ? "PUT" : rawOp;
+
+    return {
+      timestamp: pickString(e, ["timestamp", "time", "ts"]),
+      op,
+      key: pickString(e, ["key", "Key", "k"]),
+      value: pick(e, ["value", "val"]),
+    } as WALEntry;
+  });
 }

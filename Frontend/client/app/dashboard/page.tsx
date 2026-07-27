@@ -37,7 +37,10 @@ export default function DashboardPage() {
   const writeHistory = useHistory(status.writeLatencyMs);
 
   const diskUsed = splitBytes(status.diskUsageBytes, 1);
-  const memtableSize = splitBytes(status.memtableSizeBytes ?? memtable.sizeBytes, 0);
+  const memtableSize = splitBytes(
+    status.memtableSizeBytes ?? memtable.sizeBytes,
+    0,
+  );
   const diskPercent =
     status.diskUsageBytes !== undefined && status.diskUsageTotalBytes
       ? (status.diskUsageBytes / status.diskUsageTotalBytes) * 100
@@ -50,71 +53,77 @@ export default function DashboardPage() {
         subtitle="Real-time overview of your database engine"
         online={!statusError}
       />
-      <EngineControls running={status.running ?? !statusError} />
 
-      <section className="grid grid-cols-2 gap-4 px-6 pt-5 sm:grid-cols-3 xl:grid-cols-7">
-        <MetricCard
-          icon={Activity}
-          label="Requests / sec"
-          value={formatNumber(status.requestsPerSec)}
-          history={requestsHistory}
-        />
-        <MetricCard
-          icon={Clock}
-          label="Read Latency"
-          value={formatMs(status.readLatencyMs)}
-          unit="ms"
-          history={readHistory}
-        />
-        <MetricCard
-          icon={PenLine}
-          label="Write Latency"
-          value={formatMs(status.writeLatencyMs)}
-          unit="ms"
-          history={writeHistory}
-        />
-        <MetricCard
-          icon={HardDrive}
-          label="Disk Usage"
-          value={diskUsed.value}
-          unit={diskUsed.unit}
-          progress={
-            diskPercent !== undefined
-              ? { percent: diskPercent, label: `${diskPercent.toFixed(0)}%` }
-              : undefined
-          }
-        />
-        <MetricCard
-          icon={Layers}
-          label="SSTables"
-          value={formatNumber(sstables.total)}
-          unit="Files"
-        />
-        <MetricCard
-          icon={Database}
-          label="MemTable Size"
-          value={memtableSize.value}
-          unit={memtableSize.unit}
-        />
-        <MetricCard
-          icon={RefreshCw}
-          label="Compactions"
-          value={formatNumber(status.activeCompactions)}
-          unit="Active"
-        />
-      </section>
+      <div className="px-4 py-4 md:px-6 md:py-6">
+        <EngineControls running={status.running ?? !statusError} />
 
-      <section className="grid grid-cols-1 gap-4 px-6 pt-5 lg:grid-cols-3">
-        <MemTablePanel memtable={memtable} isLoading={memtableLoading} />
-        <SSTablesPanel sstables={sstables} isLoading={sstablesLoading} />
-        <CompactionPanel sstables={sstables} activeCompactions={status.activeCompactions} />
-      </section>
+        <section className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4 2xl:grid-cols-7">
+          <MetricCard
+            icon={Activity}
+            label="Requests / sec"
+            value={formatNumber(status.requestsPerSec)}
+            history={requestsHistory}
+          />
+          <MetricCard
+            icon={Clock}
+            label="Read Latency"
+            value={formatMs(status.readLatencyMs)}
+            unit="ms"
+            history={readHistory}
+          />
+          <MetricCard
+            icon={PenLine}
+            label="Write Latency"
+            value={formatMs(status.writeLatencyMs)}
+            unit="ms"
+            history={writeHistory}
+          />
+          <MetricCard
+            icon={HardDrive}
+            label="Disk Usage"
+            value={diskUsed.value}
+            unit={diskUsed.unit}
+            progress={
+              diskPercent !== undefined
+                ? { percent: diskPercent, label: `${diskPercent.toFixed(0)}%` }
+                : undefined
+            }
+          />
+          <MetricCard
+            icon={Layers}
+            label="SSTables"
+            value={formatNumber(sstables.total)}
+            unit="Files"
+          />
+          <MetricCard
+            icon={Database}
+            label="MemTable Size"
+            value={memtableSize.value}
+            unit={memtableSize.unit}
+          />
+          <MetricCard
+            icon={RefreshCw}
+            label="Compactions"
+            value={formatNumber(status.activeCompactions)}
+            unit="Active"
+          />
+        </section>
 
-      <section className="grid grid-cols-1 gap-4 px-6 py-5 lg:grid-cols-3">
-        <BloomFilterPanel />
-        <WALPanel entries={walEntries} isLoading={walLoading} />
-        <LogsPanel entries={walEntries} isLoading={walLoading} />
-      </section>
+        <section className="mt-4 grid grid-cols-1 gap-4 xl:grid-cols-[1.1fr_0.95fr_0.95fr]">
+          <MemTablePanel memtable={memtable} isLoading={memtableLoading} />
+          <SSTablesPanel sstables={sstables} isLoading={sstablesLoading} />
+          <CompactionPanel
+            sstables={sstables}
+            activeCompactions={status.activeCompactions}
+          />
+        </section>
+
+        <section className="mt-4 grid grid-cols-1 gap-4 xl:grid-cols-3">
+          <BloomFilterPanel />
+          <WALPanel entries={walEntries} isLoading={walLoading} />
+          <LogsPanel entries={walEntries} isLoading={walLoading} />
+        </section>
+      </div>
 
       <div className="mt-auto">
         <StatusFooter status={status} />

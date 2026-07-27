@@ -6,20 +6,29 @@ import type { EngineStatusView } from "@/lib/normalize";
 
 export default function StatusFooter({ status }: { status: EngineStatusView }) {
   return (
-    <div className="flex flex-wrap items-center gap-x-8 gap-y-2 border-t border-border px-6 py-3 text-xs text-muted-foreground">
-      <span className="flex items-center gap-1.5">
+    <div className="flex flex-wrap items-center gap-x-6 gap-y-3 border-t border-border/70 bg-background/60 px-4 py-3 text-xs text-muted-foreground backdrop-blur md:px-6">
+      <span className="flex items-center gap-1.5 rounded-full border border-border/70 bg-card/70 px-2.5 py-1">
         <Clock className="size-3.5" />
-        Uptime: <span className="font-medium text-foreground">{formatUptime(status.uptimeSeconds)}</span>
+        Uptime:{" "}
+        <span className="font-medium text-foreground">
+          {formatUptime(status.uptimeSeconds)}
+        </span>
       </span>
-      <span className="flex items-center gap-1.5">
+      <span className="flex items-center gap-1.5 rounded-full border border-border/70 bg-card/70 px-2.5 py-1">
         <Tag className="size-3.5" />
-        Version: <span className="font-medium text-foreground">{status.version ?? "—"}</span>
+        Version:{" "}
+        <span className="font-medium text-foreground">
+          {status.version ?? "—"}
+        </span>
       </span>
-      <span className="flex items-center gap-1.5">
+      <span className="flex items-center gap-1.5 rounded-full border border-border/70 bg-card/70 px-2.5 py-1">
         <Network className="size-3.5" />
-        Connections: <span className="font-medium text-foreground">{status.connections ?? "—"}</span>
+        Connections:{" "}
+        <span className="font-medium text-foreground">
+          {status.connections ?? "—"}
+        </span>
       </span>
-      <span className="flex items-center gap-1.5">
+      <span className="flex items-center gap-1.5 rounded-full border border-border/70 bg-card/70 px-2.5 py-1">
         <HardDrive className="size-3.5" />
         Heap Usage:{" "}
         <span className="font-medium text-foreground">
@@ -28,7 +37,7 @@ export default function StatusFooter({ status }: { status: EngineStatusView }) {
             : "—"}
         </span>
       </span>
-      <span className="ml-auto flex items-center gap-1.5">
+      <span className="ml-auto flex items-center gap-1.5 rounded-full border border-border/70 bg-card/70 px-2.5 py-1">
         <Cpu className="size-3.5" />
         CPU Usage:{" "}
         <span className="font-medium text-foreground">

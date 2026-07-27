@@ -17,11 +17,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={cn("h-full", "antialiased", "dark")}>
-      <body className="min-h-full bg-background text-foreground font-sans">
+      <body className="min-h-screen bg-[radial-gradient(circle_at_top_left,_rgba(242,194,48,0.12),_transparent_28%),linear-gradient(135deg,_rgba(255,255,255,0.02),_transparent_55%)] bg-background text-foreground font-sans">
         <QueryProvider>
-          <div className="min-h-screen md:flex">
+          <div className="min-h-screen bg-transparent">
             <Sidebar />
-            <div className="flex-1 min-w-0">{children}</div>
+            <div className="min-w-0 md:pl-[260px]">
+              <div className="mx-auto flex min-h-screen w-full max-w-7xl flex-col">
+                {children}
+              </div>
+            </div>
           </div>
         </QueryProvider>
       </body>
