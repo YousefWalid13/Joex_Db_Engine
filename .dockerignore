@@ -1,9 +1,22 @@
-# directories
+# Build output
 **/bin/
 **/obj/
 **/out/
 
-# files
-fly.toml
-Dockerfile*
-**/*.md
+# Frontend
+Frontend/
+
+# Node
+**/node_modules/
+**/.next/
+
+# IDE
+.vs/
+.vscode/
+
+# Git
+.git/
+.github/
+
+# Documentation
+*.md

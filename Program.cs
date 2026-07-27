@@ -35,21 +35,25 @@ public class Program
         builder.Services.AddSwaggerGen();
 
         // -------------------- CORS --------------------
-        builder.Services.AddCors(options =>
-        {
-            options.AddPolicy("AllowFrontend", policy =>
+       builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+        policy
+            .SetIsOriginAllowed(origin =>
             {
-                policy
-                    .WithOrigins(
-                        "http://localhost:3000",
-                        "http://127.0.0.1:3000"
-                    // Add your Vercel URL here after deployment:
-                    // "https://your-app.vercel.app"
-                    )
-                    .AllowAnyHeader()
-                    .AllowAnyMethod();
-            });
-        });
+                if (origin.StartsWith("http://localhost"))
+                    return true;
+
+                if (origin.EndsWith(".vercel.app"))
+                    return true;
+
+                return false;
+            })
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
         // ------------------------------------------------
 
         var dbPath = builder.Configuration["Database:Path"]
